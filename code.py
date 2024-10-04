@@ -1,20 +1,24 @@
-import re   
-# re est un module intégré en Python qui permet de travailler avec des expressions régulières. 
+import re
 
 # Étape 1: Segmentation d'un texte en phrases
 def segmenter_en_phrases(texte):
-    phrases = re.split(r'(?<=[.!?;])\s+', texte.strip())
+    # On segmente les phrases en utilisant des marqueurs de fin de phrase suivis d'un espace (avec gestion des guillemets).
+    phrases = re.split(r'(?<=[.!?;])\s+(?="?)', texte.strip())
     return [phrase for phrase in phrases if phrase]
 
 # Étape 2: Segmentation d'une phrase en mots
 def segmenter_en_mots(phrase):
-    # On utilise une expression régulière pour séparer les mots
-    mots = re.findall(r"\w+(?:[-']\w+)?|[.,!?;]", phrase)
+    # Expression régulière modifiée pour capturer les mots, les contractions, les nombres et les unités (par ex. 19h30).
+    mots = re.findall(r"\b\w+(?:[-']\w+)*\b|\d+[hH]?\d*|[.,!?;\"']", phrase)
     return mots
 
 # Étape 3: Génération d'une phrase à partir d'une liste de mots
 def generer_phrase(mots):
-    return ' '.join(mots).replace("  ", " ").strip() + "."
+    phrase = ' '.join(mots).replace("  ", " ").strip()
+    # On ajoute un point à la fin si la phrase ne se termine pas déjà par un signe de ponctuation
+    if not re.match(r'[.!?;]$', phrase):
+        phrase += '.'
+    return phrase
 
 # Programme principal
 if __name__ == "__main__":
